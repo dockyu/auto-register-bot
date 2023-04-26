@@ -3,4 +3,4 @@ bot for register and get free cloud storage space
 
 ### demo
 
-{%youtube yER2stMcz9M %}
+[![Watch the video](https://img.youtube.com/vi/yER2stMcz9M/maxresdefault.jpg)](https://www.youtube.com/watch?v=yER2stMcz9M)
