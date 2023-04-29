@@ -85,7 +85,14 @@ def register(driver, first_name, last_name, email_address, user_id, password):
     actionChains.click(Password_confirmation).perform()
     not_typing(Password_confirmation, password)
     
-
+    try:
+        cloud_flare = driver.find_element(By.XPATH, '//*[@id="challenge-stage"]/div/label/input') # cloud flare check box
+        time.sleep(fill_stop)
+        actionChains.move_to_element(cloud_flare).perform()
+        # actionChains.click(cloud_flare).perform()
+        cloud_flare.click()
+    except:
+        pass
 
     time.sleep(fill_stop)
     driver.find_element(By.XPATH, '/html/body/div[2]/div[2]/form/div/div[9]/input').click() # next

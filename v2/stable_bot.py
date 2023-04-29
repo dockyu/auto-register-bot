@@ -18,7 +18,11 @@ def flow(chromedriver_index):
     # options.add_argument('--proxy-server=%s' % PROXY)
     driver_path = 'D:\\Project\\auto-register-bot\\driver\\chromedriver'+ str(chromedriver_index) +'.exe'
     driver = uc.Chrome(options=options, driver_executable_path=driver_path) 
-    driver.maximize_window() 
+    # driver.maximize_window() 
+    # driver.minimize_window()
+    driver.set_window_size(300, 500)
+    
+    driver.set_window_position(1700, 200)
 
     try:
          
@@ -40,7 +44,7 @@ def flow(chromedriver_index):
 
 
         # Start listening one mail
-        mail_service.start(listener, interval=5)
+        mail_service.one_bot_start(listener, interval=3)
 
         # time.sleep(100000)
 
@@ -69,6 +73,7 @@ def flow(chromedriver_index):
         crawler.login(driver, tmp_user_id, tmp_password, my_referral_code)
     except Exception as e:
         print(e)
+        mail_service.stop_force()
         driver.close()
         return
 
@@ -81,8 +86,10 @@ def flow(chromedriver_index):
 if __name__ == "__main__":
      
      while True:
-        flow(0)
-        time.sleep(1)
+        for i in range(6):
+            flow(0)
+            time.sleep(1)
+        time.sleep(300)
     # 創建5個thread
     # threads = []
     # for i in range(1):

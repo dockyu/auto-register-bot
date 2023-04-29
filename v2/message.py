@@ -66,6 +66,19 @@ class Listen:
             # lock.release()
             time.sleep(self.interval)
 
+    def one_bot_receive(self):
+        print('receive_one_mail function')
+        while self.listen:
+            # lock.acquire()
+            for message in self.message_list():
+                self.message_ids.append(message['id'])
+                message = self.message(message['id'])
+                self.listener(message)
+                if (message['text']):
+                    self.email_content = message['text']
+                    return
+            time.sleep(self.interval)
+
     def start(self, listener, interval=3):
         if self.listen:
             self.stop()
@@ -78,10 +91,23 @@ class Listen:
         # self.thread = Thread(target=self.run)
         self.thread = Thread(target=self.receive_one_mail)
         self.thread.start()
+
+    def one_bot_start(self, listener, interval=3):
+        if self.listen:
+            self.stop()
+
+        self.listener = listener
+        self.interval = interval
+        self.listen = True
+
+        # Start listening thread
+        # self.thread = Thread(target=self.run)
+        self.thread = Thread(target=self.one_bot_receive)
+        self.thread.start()
     
     def stop_when_finish(self):
         # self.listen = False
-        self.thread.join(timeout=60)
+        self.thread.join(timeout=70)
         self.listen = False
     
     def stop_force(self):
