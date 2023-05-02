@@ -6,6 +6,8 @@ import multiprocessing
 
 lock = threading.Lock()
 semaphore = threading.Semaphore(2)
+message_list_semaphore = threading.Semaphore(2)
+message_semphore = threading.Semaphore(2)
 
 class Listen:
     listen = False
@@ -16,11 +18,12 @@ class Listen:
         # lock.acquire()
         url = "https://api.mail.tm/messages"
         headers = { 'Authorization': 'Bearer ' + self.token }
-        lock.acquire()
+        # lock.acquire()
         response = self.session.get(url, headers=headers)
+        message_list_semaphore.acquire()
         response.raise_for_status()
-        time.sleep(1)
-        lock.release()
+        time.sleep(2)
+        message_list_semaphore.release()
         
         data = response.json()
         return  [
@@ -31,11 +34,12 @@ class Listen:
     def message(self, idx):
         url = "https://api.mail.tm/messages/" + idx
         headers = { 'Authorization': 'Bearer ' + self.token }
-        lock.acquire()
+        # lock.acquire()
         response = self.session.get(url, headers=headers)
+        message_semphore.acquire()
         response.raise_for_status()
-        time.sleep(1)
-        lock.release()
+        time.sleep(2)
+        message_semphore.release()
         return response.json()
 
     def run(self):
@@ -61,6 +65,7 @@ class Listen:
                 if (message['text']):
                     self.email_content = message['text']
                     # lock.release()
+                    semaphore.release()
                     return
             semaphore.release()
             # lock.release()

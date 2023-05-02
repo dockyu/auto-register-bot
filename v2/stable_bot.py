@@ -89,7 +89,7 @@ if __name__ == "__main__":
         for i in range(6):
             flow(0)
             time.sleep(1)
-        time.sleep(300)
+        time.sleep(10)
     # 創建5個thread
     # threads = []
     # for i in range(1):

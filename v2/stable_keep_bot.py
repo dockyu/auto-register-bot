@@ -1,14 +1,10 @@
 from threading import Thread
-import threading
 import email_module
 import crawler
 import undetected_chromedriver as uc
+from selenium import webdriver
 import time
-import math
 import names # generate random name
-import multiprocessing
-
-semaphore = threading.Semaphore(4)
 
 def listener(message):
         # print("\nSubject: " + message['subject'])
@@ -16,19 +12,28 @@ def listener(message):
         print("execute listener, get email message")
         # print(message['text'])
 
+def driver_position(driver):
+    driver.set_window_size(300, 500)
+    # driver.set_window_position(1700, 200)
+    driver.set_window_position(300, 200)
 
 def flow(chromedriver_index):
     options = uc.ChromeOptions()
+    # PROXY = "103.37.88.10:80"
+    # options.add_argument('--proxy-server=%s' % PROXY)
+    # prefs = {
+    #           'profile.default_content_setting_values': {
+    #             'javascript': 2        #2即为禁用的意思
+    #             }
+    # }
+    # options.add_experimental_option('prefs', prefs)
+    # options.add_argument('--proxy-server=socks5://localhost:9050')
+    # driver = webdriver.Chrome(chrome_options=chrome_options)
     driver_path = 'D:\\Project\\auto-register-bot\\driver\\chromedriver'+ str(chromedriver_index) +'.exe'
-    driver = uc.Chrome(options=options, driver_executable_path=driver_path)
-
-    window_width = 750
-    window_height = 400
-    driver.set_window_size(window_width, window_height)
-    
-    position_x = (chromedriver_index%2)*window_width
-    position_y = math.floor(chromedriver_index/2)*window_height
-    driver.set_window_position(position_x, position_y)
+    driver = uc.Chrome(options=options, driver_executable_path=driver_path) 
+    # driver.maximize_window() 
+    # driver.minimize_window()
+    driver_position(driver)
 
     try:
          
@@ -37,10 +42,7 @@ def flow(chromedriver_index):
         print("\nDomain: " + mail_service.domain)
 
         # Make new email address
-        semaphore.acquire()
         mail_service.register()
-        time.sleep(2)
-        semaphore.release()
         print("\nEmail Adress: " + str(mail_service.address))
 
         # temp user information
@@ -53,7 +55,7 @@ def flow(chromedriver_index):
 
 
         # Start listening one mail
-        mail_service.start(listener, interval=2)
+        mail_service.one_bot_start(listener, interval=3)
 
         # time.sleep(100000)
 
@@ -79,39 +81,48 @@ def flow(chromedriver_index):
         # authenticate email
         crawler.authentication(driver, tmp_verification_code)
 
+        # driver.close()
+        # driver = webdriver.Chrome()
+        # driver_position(driver)
+
         crawler.login(driver, tmp_user_id, tmp_password, my_referral_code)
     except Exception as e:
         print(e)
+        mail_service.stop_force()
         driver.close()
         return
 
     driver.close()
 
 
-def task(thread_nums):
-     # 創建5個thread
-    threads = []
-    for i in range(thread_nums):
-        t = Thread(target=flow, args=(i,))
-        threads.append(t)
 
-    # 啟動所有thread
-    for t in threads:
-        t.start()
-        time.sleep(1)
-    
-    # 等待所有thread結束
-    for i in range(len(threads)):
-        if i==0:
-            threads[i].join(timeout=90)
-        else:
-            threads[i].join(5)
 
 
 if __name__ == "__main__":
-    while True:
-        task(4)
-        time.sleep(3)
+     
+     while True:
+        for i in range(6):
+            flow(0)
+            time.sleep(1)
+        time.sleep(10)
+    # 創建5個thread
+    # threads = []
+    # for i in range(1):
+    #     t = Thread(target=flow, args=(i,))
+    #     threads.append(t)
+
+    # # 啟動所有thread
+    # for t in threads:
+    #     t.start()
+    
+    # # 等待所有thread結束
+    # for i in range(len(threads)):
+    #     if i==0:
+    #         threads[i].join(timeout=60)
+    #     elif i==1:
+    #         threads[i].join(timeout=30)
+    #     else:
+    #         threads[i].join(timeout=1)
     
 
 

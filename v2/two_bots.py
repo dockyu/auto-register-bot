@@ -82,7 +82,9 @@ def flow(chromedriver_index):
         crawler.login(driver, tmp_user_id, tmp_password, my_referral_code)
     except Exception as e:
         print(e)
+        mail_service.stop_force()
         driver.close()
+        
         return
 
     driver.close()
